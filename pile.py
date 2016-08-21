@@ -18,7 +18,6 @@ class Pile:
             card_count_info = card_count_info + "There is 1 card in this pile. "
         if(self.card_count > 1):
             card_count_info = card_count_info + "There are "+str(self.card_count)+" cards in this pile. "
-
         for card in self.card_list:
             card_list_info = card_list_info + str(card) + "\n"
 
@@ -29,6 +28,7 @@ class Pile:
     def __len__(self):
         return self.card_count
 
+    #Makes sure that pile parameters mkae sense
     def check_rep(self):
         #Error strings
         pile_count_error = "There are a negative number cards. Check under the table, maybe they fell"
@@ -37,38 +37,42 @@ class Pile:
 
         #Checks
         assert self.card_count >= 0, pile_count_error
-        assert type(self.card_list) is ListType, pile_list_error
         assert len(self.card_list) == self.card_count, pile_card_error
 
-    def empty_pile(self):
-        self.card_list = []
-        self.card_count = 0
-
+    #Adds a single card to a pile
     def add_card(self, card):
         self.card_list.append(card)
         self.card_count += 1
 
+    #Adds all the cards in another pile to this pile
     def add_pile(self, pile):
         self.card_list.extend(pile.card_list)
         self.card_count += pile.card_count
         pile.empty_pile()
 
+    #Removes a card from the top of this pile and returns that card
     def draw_card(self):
         self.card_count -= 1
         return self.card_list.pop(0)
 
+    #Removes a pile from the top of this pile and returns that pile
+    def remove_pile(self, pile_size):
+        if pile_size > self.card_count:
+            pile_size = card_count
+        new_pile_list = self.card_list[0:pile_size]
+        self.card_list = self.card_list[pile_size:]
+        self.card_count -= pile_size
+        return Pile(pile_size, new_pile_list)
+
+    #Cuts this pile into the desired number of piles and returns a list of all the piles
     def cut(self, number_of_piles):
         number_of_cards = self.card_count
         number_of_cards_in_subpile = number_of_cards/number_of_piles
         new_pile_list = []
         extra_cards = number_of_cards % number_of_piles
-        for i in range(number_of_piles):
-            new_pile_list.append(Pile(card_count=number_of_cards_in_subpile, card_list = self.card_list[i * number_of_cards_in_subpile: (i+1) * number_of_cards_in_subpile]))
-
-        for j in range(0, extra_cards):
-            new_pile_list[random.randint(0, extra_cards)].add_card(self.card_list[self.card_count - j])
-        self.card_list = new_pile_list[-1]
-        self.card_count = len(new_pile_list[-1])
+        for i in range(number_of_piles - 1):
+            new_pile_list.append(self.remove_pile(number_of_cards_in_subpile))
+        new_pile_list = [self] + new_pile_list
         return new_pile_list
 
     def roundrobin(self, *iterables):
@@ -112,6 +116,7 @@ def reset():
 ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
 nertz_pile = Pile(card_count=1, card_list=[ace_diamonds])
 decks = deck.cut(3)
+# print decks
 for deck in decks:
     print deck
 # print nertz_pile

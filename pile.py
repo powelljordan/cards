@@ -18,8 +18,10 @@ class Pile:
             card_count_info = card_count_info + "There is 1 card in this pile. "
         if(self.card_count > 1):
             card_count_info = card_count_info + "There are "+str(self.card_count)+" cards in this pile. "
-        for card in self.card_list:
-            card_list_info = card_list_info + str(card) + "\n"
+
+        card_list_info = str(self.card_list[0]) + "\n"
+        # for card in self.card_list:
+        #     card_list_info = card_list_info + str(card) + "\n"
 
         card_count_info = card_count_info + "\n" + card_list_info
 
@@ -38,6 +40,12 @@ class Pile:
         #Checks
         assert self.card_count >= 0, pile_count_error
         assert len(self.card_list) == self.card_count, pile_card_error
+
+    def get_top_card(self):
+        return self.card_list[0]
+
+    def get_all_cards(self):
+        return self.card_list
 
     #Adds a single card to a pile
     def add_card(self, card):
@@ -106,6 +114,12 @@ def generateDeck(card_values, card_suit_color_map):
             final_deck.add_card(Card(style="bicycle", suit=key, value=value, color=card_suit_color_map[key], face_up=True))
     return final_deck
 
+
+
+#############################################################
+#                          Tests                            #
+#############################################################
+
 deck = generateDeck(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], {"hearts":"red", "diamonds": "red", "spades":"black", "clubs":"black"})
 
 def reset():
@@ -115,9 +129,11 @@ def reset():
 
 ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
 nertz_pile = Pile(card_count=1, card_list=[ace_diamonds])
-decks = deck.cut(3)
+print deck
+# decks = deck.cut(3)
 # print decks
-for deck in decks:
-    print deck
+# for deck in decks:
+#     print deck
 # print nertz_pile
-# print nertz_pile.shuffle(1)
+# for i in range(8):
+#     print deck.shuffle(1)

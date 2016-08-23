@@ -13,7 +13,7 @@ class Card:
     def __str__(self):
         self.check_rep()
         if self.face_up:
-            return "Color: "+self.color+" Suit: "+self.suit+" Value: "+self.value
+            return self.color+" "+self.value+" "+self.suit
         return "Style: "+self.style
 
 

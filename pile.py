@@ -4,22 +4,22 @@ from itertools import islice, cycle
 import random
 
 class Pile:
-    def __init__(self, card_count=0, card_list=[]):
-        self.card_count = card_count
+    def __init__(self, card_list=[]):
         self.card_list = card_list
+        self.card_count = len(card_list)
 
     def __str__(self):
         self.check_rep()
         card_count_info = ""
         card_list_info = ""
-        if(self.card_count == 0):
+        if self.card_count == 0:
             card_count_info = card_count_info + "There are no cards in this pile. "
-        if(self.card_count == 1):
+        if self.card_count == 1:
             card_count_info = card_count_info + "There is 1 card in this pile. "
-        if(self.card_count > 1):
+            card_list_info = "The top card is a "+ str(self.card_list[0]) + "\n"
+        if self.card_count > 1:
             card_count_info = card_count_info + "There are "+str(self.card_count)+" cards in this pile. "
-
-        card_list_info = str(self.card_list[0]) + "\n"
+            card_list_info = "The top card is a "+ str(self.card_list[0]) + "\n"
         # for card in self.card_list:
         #     card_list_info = card_list_info + str(card) + "\n"
 
@@ -35,7 +35,7 @@ class Pile:
         #Error strings
         pile_count_error = "There are a negative number cards. Check under the table, maybe they fell"
         pile_list_error = "This pile doesn't have a list of cards."
-        pile_card_error = "The card count isn't quite right by my count. Is that an contraband ace you're slipping in?"
+        pile_card_error = "The card count "+str(self.card_count)+" isn't quite right by my count "+str(len(self.card_list))+" . Is that an contraband ace you're slipping in?"
 
         #Checks
         assert self.card_count >= 0, pile_count_error
@@ -51,12 +51,13 @@ class Pile:
     def add_card(self, card):
         self.card_list.append(card)
         self.card_count += 1
+        print self.card_count
 
     #Adds all the cards in another pile to this pile
     def add_pile(self, pile):
         self.card_list.extend(pile.card_list)
         self.card_count += pile.card_count
-        pile.empty_pile()
+
 
     #Removes a card from the top of this pile and returns that card
     def draw_card(self):
@@ -120,7 +121,7 @@ def generateDeck(card_values, card_suit_color_map):
 #                          Tests                            #
 #############################################################
 
-deck = generateDeck(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], {"hearts":"red", "diamonds": "red", "spades":"black", "clubs":"black"})
+# deck = generateDeck(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], {"hearts":"red", "diamonds": "red", "spades":"black", "clubs":"black"})
 
 def reset():
     deck = generateDeck(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], {"hearts":"red", "diamonds": "red", "spades":"black", "clubs":"black"})
@@ -128,8 +129,8 @@ def reset():
 
 
 ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
-nertz_pile = Pile(card_count=1, card_list=[ace_diamonds])
-print deck
+nertz_pile = Pile(card_list=[ace_diamonds])
+# print deck
 # decks = deck.cut(3)
 # print decks
 # for deck in decks:

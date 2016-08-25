@@ -73,7 +73,9 @@ class Nertz:
                     print player + "'s " + str(area) + str(self.player_areas[player][area])
             print self.player_areas["communal_area"]
 
-    def move(self, from_area, from_pile_location, to_area, to_pile_location, player=self.player[0], flip=False):
+    def move(self, from_area, from_pile_location, to_area, to_pile_location, player=None, flip=False):
+        if player is None:
+            player = self.player[0]
         card = self.player_areas[player][from_area][from_pile_location].draw_card()
         card_at_dest = self.player_areas[player][to_area][to_pile_location].view_top_card()
         if self.rules(card, card_at_dest):
@@ -81,7 +83,9 @@ class Nertz:
                 card.flip_card()
             self.player_areas[player][to_area][to_pile_location].add_card(card)
 
-    def flip_cards(self, from_area, from_pile_location, to_area, to_pile_location, player=self.player[0], num_to_flip=3):
+    def flip_cards(self, from_area, from_pile_location, to_area, to_pile_location, player=None, num_to_flip=3):
+        if player is None:
+            player = self.player[0]
         if self.player_areas[player][from_area][from_pile_location].card_count > 0:
             for i in range(num_to_flip):
                 self.move(from_area, from_pile_location, to_area, to_pile_location, player)

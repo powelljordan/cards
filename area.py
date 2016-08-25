@@ -85,17 +85,17 @@ S5 = Card(style="bicycle", suit="spades", value="5", face_up=True, color="black"
 spades = Pile([SA, S2, S3])
 hearts = Pile([H3, H2, HA])
 communal_area = Area(name="communal area", pile_location_list = [("spades_location", spades), ("hearts_location", hearts)])
-print communal_area
-print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nAdd 4 of spades to spades pile\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-communal_area.add_pile(("spades_location",Pile([S4])))
-print communal_area
-print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nRemove hearts pile from communal area\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-communal_area.remove_pile("hearts_location")
-print communal_area
-stacking_area = Area("stacking area", pile_location_list = [("first_stack", Pile([S5]))])
-print stacking_area
-communal_area.add_pile(("spades_location",stacking_area.remove_pile("first_stack")))
-# stacking_area.remove_pile("first_stack")
-print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nMoved 5 of spades form stacking area to communal area\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-print stacking_area
-print communal_area
+# print communal_area
+# print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nAdd 4 of spades to spades pile\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+# communal_area.add_pile(("spades_location",Pile([S4])))
+# print communal_area
+# print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nRemove hearts pile from communal area\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+# communal_area.remove_pile("hearts_location")
+# print communal_area
+# stacking_area = Area("stacking area", pile_location_list = [("first_stack", Pile([S5]))])
+# print stacking_area
+# communal_area.add_pile(("spades_location",stacking_area.remove_pile("first_stack")))
+# # stacking_area.remove_pile("first_stack")
+# print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nMoved 5 of spades form stacking area to communal area\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+# print stacking_area
+# print communal_area

@@ -41,40 +41,46 @@ class Pile:
         assert self.card_count >= 0, pile_count_error
         assert len(self.card_list) == self.card_count, pile_card_error
 
-    def get_top_card(self):
+    def view_top_card(self):
+        self.check_rep()
         return self.card_list[0]
 
     def get_all_cards(self):
+        self.check_rep()
         return self.card_list
 
     #Adds a single card to a pile
     def add_card(self, card):
-        self.card_list.append(card)
+        self.check_rep()
+        self.card_list = [card] + self.card_list
         self.card_count += 1
-        print self.card_count
 
     #Adds all the cards in another pile to this pile
     def add_pile(self, pile):
+        self.check_rep()
         self.card_list.extend(pile.card_list)
         self.card_count += pile.card_count
 
 
     #Removes a card from the top of this pile and returns that card
     def draw_card(self):
+        self.check_rep()
         self.card_count -= 1
         return self.card_list.pop(0)
 
     #Removes a pile from the top of this pile and returns that pile
     def remove_pile(self, pile_size):
+        self.check_rep()
         if pile_size > self.card_count:
             pile_size = card_count
         new_pile_list = self.card_list[0:pile_size]
         self.card_list = self.card_list[pile_size:]
         self.card_count -= pile_size
-        return Pile(pile_size, new_pile_list)
+        return Pile(new_pile_list)
 
     #Cuts this pile into the desired number of piles and returns a list of all the piles
     def cut(self, number_of_piles):
+        self.check_rep()
         number_of_cards = self.card_count
         number_of_cards_in_subpile = number_of_cards/number_of_piles
         new_pile_list = []
@@ -98,6 +104,7 @@ class Pile:
                 nexts = cycle(islice(nexts, pending))
 
     def shuffle(self, number_of_times):
+        self.check_rep()
         combined_hand = self.card_list
         for i in range(number_of_times):
             mid = len(combined_hand)/2

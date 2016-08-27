@@ -65,6 +65,9 @@ class Area:
     #Returns the pile stored at a specific location in this area
     def get_pile(self, location):
         self.check_rep()
+        if location in self.pile_locations:
+            return self.pile_locations[location]
+        self.add_pile((location, Pile()))
         return self.pile_locations[location]
 
 #############################################################

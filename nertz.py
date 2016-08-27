@@ -17,8 +17,11 @@ class Nertz:
     #Return visible game state
     def __str__(self):
         game_state = ""
-        for area in self.player_areas:
-            game_state = game_state + str(area) + "\n"
+        for player in self.player_areas:
+            if player != "communal_area":
+                for area in self.player_areas[player]:
+                    game_state = "\n" + game_state + player + "'s " + str(area) + str(self.player_areas[player][area])
+        game_state = game_state + str(self.player_areas["communal_area"])
         return game_state
 
     #Generates the necessary areas for each player_areas
@@ -42,10 +45,11 @@ class Nertz:
         values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
         suit_color = [("hearts", "red"), ("diamonds", "red"), ("spades", "black"), ("clubs", "black")]
         for player in players:
+            self.turn += 1
             #Create a deck of 52 cards
             standard_deck = Pile([Card(style=player,color=color, suit=suit, value=val) for val in values for (suit, color) in suit_color])
             #shuffle that deck a random number of times
-            standard_deck.shuffle(random.randint(3, 6))
+            standard_deck.shuffle(3+self.turn) #changed this just for testing
             #take off the top 13 cards
             nertz_pile_area_cards = Pile()
             for i in range(self.nertz_pile_count - 1):
@@ -57,7 +61,8 @@ class Nertz:
             #put those cards in the nertz pile area
             self.player_areas[player]["nertz_pile_area"].add_pile(("nertz_pile_location", nertz_pile_area_cards))
             #shuffle the deck a random number of times
-            standard_deck.shuffle(random.randint(3, 6))
+            # standard_deck.shuffle(random.randint(3, 6)) #changed this just for testing
+            standard_deck.shuffle(3+self.turn)
             #put one card in each stacking pile within the stacking area
             stacking_locations = ["first", "second", "third", "fourth"]
             for location in stacking_locations:
@@ -67,32 +72,46 @@ class Nertz:
                 self.player_areas[player]["stacking_area"].add_pile((location, top_card_pile))
             #put the rest in the flipping_area
             self.player_areas[player]["flipping_area"].add_pile(("flipping_location", standard_deck))
-        for player in self.player_areas:
-            if player != "communal_area":
-                for area in self.player_areas[player]:
-                    print player + "'s " + str(area) + str(self.player_areas[player][area])
-            print self.player_areas["communal_area"]
+        #This bit here goes through and prints out everything for visual verification
+
 
     def move(self, from_area, from_pile_location, to_area, to_pile_location, player=None, flip=False):
         if player is None:
-            player = self.player[0]
-        card = self.player_areas[player][from_area][from_pile_location].draw_card()
-        card_at_dest = self.player_areas[player][to_area][to_pile_location].view_top_card()
-        if self.rules(card, card_at_dest):
+            player = self.players[0]
+        #Check the rules that this is a valid move
+        if self.rules(from_area, to_area):
+            #The communal_area isn't based on a player and so it's at the player level of the dictionary
+            if from_area == "communal_area":
+                card = self.player_areas[from_area].get_pile(from_pile_location).draw_card()
+                card_at_dest = self.player_areas[player][to_area].pile(to_pile_location).view_top_card()
+                destination = self.player_areas[player][to_area].pile(to_pile_location)
+
+            elif to_area == "communal_area":
+                card = self.player_areas[player][from_area].get_pile(from_pile_location).draw_card()
+                card_at_dest = self.player_areas[to_area].get_pile(to_pile_location).view_top_card()
+                destination = self.player_areas[to_area].get_pile(to_pile_location)
+            #If it's not in the communal area then we need to get look at a specific player's playing areas
+            else:
+                card = self.player_areas[player][from_area].get_pile(from_pile_location).draw_card()
+                card_at_dest = self.player_areas[player][to_area].pile(to_pile_location).view_top_card()
+                destination = self.player_areas[player][to_area].pile(to_pile_location)
             if flip:
                 card.flip_card()
-            self.player_areas[player][to_area][to_pile_location].add_card(card)
+            destination.add_card(card)
 
-    def flip_cards(self, from_area, from_pile_location, to_area, to_pile_location, player=None, num_to_flip=3):
+    def flip_cards(self, player=None, num_to_flip=3):
+        area = "flipping_area"
+        from_location = "flipping_location"
+        to_location = "playing_location"
         if player is None:
             player = self.player[0]
-        if self.player_areas[player][from_area][from_pile_location].card_count > 0:
+        if self.player_areas[player][area].get_pile(from_location).card_count > 0:
             for i in range(num_to_flip):
-                self.move(from_area, from_pile_location, to_area, to_pile_location, player)
-            return self.player_areas[player][to_area][to_pile_location].view_top_card()
+                self.move(area, from_location, area, to_location, player, True)
+            return self.player_areas[player][area].get_pile(to_location).view_top_card()
         return None
 
-    def rules(self):
+    def rules(self, from_area, to_area):
         return True
 
 
@@ -105,3 +124,6 @@ nertz_test = Nertz(["jordan", "annie"])
 print nertz_test
 nertz_test.deal_cards()
 print nertz_test
+nertz_test.move("stacking_area", "fourth", "communal_area", "annie_spades", "annie")
+print nertz_test
+nertz_test.move("flipping_area")

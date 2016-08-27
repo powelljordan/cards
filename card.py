@@ -63,7 +63,7 @@ class Card:
 #############################################################
 
 ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
-print ace_diamonds
+# print ace_diamonds
 # ace_diamonds.flip_card()
 # print ace_diamonds
 # ace_diamonds.flip_card()

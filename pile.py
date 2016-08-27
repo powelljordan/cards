@@ -28,6 +28,7 @@ class Pile:
         return card_count_info
 
     def __len__(self):
+        self.check_rep()
         return self.card_count
 
     #Makes sure that pile parameters mkae sense
@@ -43,7 +44,9 @@ class Pile:
 
     def view_top_card(self):
         self.check_rep()
-        return self.card_list[0]
+        if self.card_count > 0:
+            return self.card_list[0]
+        return None
 
     def get_all_cards(self):
         self.check_rep()
@@ -65,8 +68,10 @@ class Pile:
     #Removes a card from the top of this pile and returns that card
     def draw_card(self):
         self.check_rep()
-        self.card_count -= 1
-        return self.card_list.pop(0)
+        if self.card_count > 0:
+            self.card_count -= 1
+            return self.card_list.pop(0)
+        return None
 
     #Removes a pile from the top of this pile and returns that pile
     def remove_pile(self, pile_size):

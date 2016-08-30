@@ -76,6 +76,7 @@ class Nertz:
 
 
     def move(self, from_area, from_pile_location, to_area, to_pile_location, player=None, flip=False):
+        flipping_area = "flipping_area"
         if player is None:
             player = self.players[0]
         #Check the rules that this is a valid move
@@ -83,21 +84,35 @@ class Nertz:
             #The communal_area isn't based on a player and so it's at the player level of the dictionary
             if from_area == "communal_area":
                 card = self.player_areas[from_area].get_pile(from_pile_location).draw_card()
-                card_at_dest = self.player_areas[player][to_area].pile(to_pile_location).view_top_card()
-                destination = self.player_areas[player][to_area].pile(to_pile_location)
+                pile_at_dest = self.player_areas[player][to_area].get_pile(to_pile_location)
+                if pile_at_dest != None:
+                    card_at_dest = pile_at_dest.view_top_card()
+                else:
+                    card_at_dest = None
 
             elif to_area == "communal_area":
                 card = self.player_areas[player][from_area].get_pile(from_pile_location).draw_card()
-                card_at_dest = self.player_areas[to_area].get_pile(to_pile_location).view_top_card()
-                destination = self.player_areas[to_area].get_pile(to_pile_location)
+                pile_at_dest = self.player_areas[to_area].get_pile(to_pile_location)
+                if pile_at_dest != None:
+                    card_at_dest = pile_at_dest.view_top_card()
+                else:
+                    card_at_dest = None
+                    self.player_areas[to_area].add_pile((to_pile_location, Pile([])))
+                    pile_at_dest = self.player_areas[to_area].get_pile(to_pile_location)
             #If it's not in the communal area then we need to get look at a specific player's playing areas
             else:
                 card = self.player_areas[player][from_area].get_pile(from_pile_location).draw_card()
-                card_at_dest = self.player_areas[player][to_area].pile(to_pile_location).view_top_card()
-                destination = self.player_areas[player][to_area].pile(to_pile_location)
+                pile_at_dest = self.player_areas[player][to_area].get_pile(to_pile_location)
+                if pile_at_dest != None:
+                    card_at_dest = pile_at_dest.view_top_card()
+                else:
+                    card_at_dest = None
+                    if to_area == flipping_area:
+                        self.player_areas[player][to_area].add_pile((to_pile_location, Pile([])))
+                        pile_at_dest = self.player_areas[player][to_area].get_pile(to_pile_location)
             if flip:
                 card.flip_card()
-            destination.add_card(card)
+            pile_at_dest.add_card(card)
 
     def flip_cards(self, player=None, num_to_flip=3):
         area = "flipping_area"
@@ -121,9 +136,11 @@ class Nertz:
 
 players = ["jordan", "annie"]
 nertz_test = Nertz(["jordan", "annie"])
-print nertz_test
+# print nertz_test
 nertz_test.deal_cards()
-print nertz_test
+# print nertz_test
 nertz_test.move("stacking_area", "fourth", "communal_area", "annie_spades", "annie")
 print nertz_test
-nertz_test.move("flipping_area")
+nertz_test.flip_cards("jordan")
+nertz_test.flip_cards("jordan")
+print nertz_test

@@ -63,12 +63,14 @@ class Area:
         return self.pile_locations.keys()
 
     #Returns the pile stored at a specific location in this area
+    #Changed the behavior so that it returns None if the pile doesn't exists
+    #The person using this method should check if the pile exists with get pile and then
+    #decide if they'd like to create that pile or if there's a typo in the name they're looking for
     def get_pile(self, location):
         self.check_rep()
         if location in self.pile_locations:
             return self.pile_locations[location]
-        self.add_pile((location, Pile()))
-        return self.pile_locations[location]
+        return None
 
 #############################################################
 #                          Tests                            #

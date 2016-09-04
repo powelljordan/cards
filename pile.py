@@ -119,6 +119,11 @@ class Pile:
         self.card_list = combined_hand
         return self
 
+# Flips every card in the deck (I think it works. . .)
+    def flipDeck(self):
+        for card in self.card_list:
+            card.flip_card()
+        return None
 
 def generateDeck(card_values, card_suit_color_map):
     final_deck = Pile()
@@ -126,7 +131,6 @@ def generateDeck(card_values, card_suit_color_map):
         for key in card_suit_color_map:
             final_deck.add_card(Card(style="bicycle", suit=key, value=value, color=card_suit_color_map[key], face_up=True))
     return final_deck
-
 
 
 #############################################################
@@ -142,7 +146,7 @@ def reset():
 
 ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
 nertz_pile = Pile(card_list=[ace_diamonds])
-# print deck
+#print deck
 # decks = deck.cut(3)
 # print decks
 # for deck in decks:
@@ -150,3 +154,4 @@ nertz_pile = Pile(card_list=[ace_diamonds])
 # print nertz_pile
 # for i in range(8):
 #     print deck.shuffle(1)
+# print deck.flipDeck()

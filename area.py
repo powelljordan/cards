@@ -23,7 +23,7 @@ class Area:
         if self.pile_count > 1:
             area_rep = area_rep + "\nThere are "+str(self.pile_count)+" piles in "+self.name+"\n\n"
         for pile in self.pile_locations.keys():
-            area_rep = area_rep + str(self.pile_locations[pile]) + "\n"
+            area_rep = area_rep + pile + " location \n" + str(self.pile_locations[pile]) + "\n"
 
         return area_rep + "============================================\n\n"
 

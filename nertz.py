@@ -80,21 +80,17 @@ class Nertz:
         if player is None:
             player = self.players[0]
         #Check the rules that this is a valid move
-        if self.rules(from_area, to_area):
+        if self.rules(from_area, from_pile_location, to_area, to_pile_location, player):
             #The communal_area isn't based on a player and so it's at the player level of the dictionary
-            if from_area == "communal_area":
-                card = self.player_areas[from_area].get_pile(from_pile_location).draw_card()
-                pile_at_dest = self.player_areas[player][to_area].get_pile(to_pile_location)
-                if pile_at_dest != None:
-                    card_at_dest = pile_at_dest.view_top_card()
-                else:
-                    card_at_dest = None
 
-            elif to_area == "communal_area":
+            if to_area == "communal_area":
                 card = self.player_areas[player][from_area].get_pile(from_pile_location).draw_card()
                 pile_at_dest = self.player_areas[to_area].get_pile(to_pile_location)
                 if pile_at_dest != None:
                     card_at_dest = pile_at_dest.view_top_card()
+                    if card.value == "K":
+                        card.flip_card()
+
                 else:
                     card_at_dest = None
                     self.player_areas[to_area].add_pile((to_pile_location, Pile([])))
@@ -107,6 +103,9 @@ class Nertz:
                     card_at_dest = pile_at_dest.view_top_card()
                 else:
                     card_at_dest = None
+                    #The flipping and communal areas are the only two that should have a variable number of piles
+                    #As a result this little add pile logic only exists for those two. The number of stacking area
+                    #and nertz area piles are fixed and should not change at any point during the game even if one is empty
                     if to_area == flipping_area:
                         self.player_areas[player][to_area].add_pile((to_pile_location, Pile([])))
                         pile_at_dest = self.player_areas[player][to_area].get_pile(to_pile_location)
@@ -126,7 +125,67 @@ class Nertz:
             return self.player_areas[player][area].get_pile(to_location).view_top_card()
         return None
 
-    def rules(self, from_area, to_area):
+    def rules(self, from_area, from_pile_location, to_area, to_pile_location, player):
+        ##Value Map
+        value_map = {"A": 1, \
+                     "2": 2, \
+                     "3": 3, \
+                     "4": 4, \
+                     "5": 5, \
+                     "6": 6, \
+                     "7": 7, \
+                     "8": 8, \
+                     "9": 9, \
+                     "10":10, \
+                     "J": 11, \
+                     "Q": 12, \
+                     "K": 13, \
+                    }
+
+        ## Nertz Pile rules
+        if to_area == "nertz_pile_area":
+            print "Cards cannot be added to the Nertz pile"
+            return False
+
+        ## Flipping Area rules
+        if to_area == "flipping_area" :
+            if from_area == "flipping_area":
+                return True
+            print "Cards cannot be added to the flipping area"
+            return False
+
+        ## Communal Area rules
+        if from_area == "communal_area":
+            print "Cards cannot be taken from the communal area"
+            return False
+
+        if to_area == "communal_area":
+            origin_pile = self.player_areas[player][from_area].get_pile(from_pile_location)
+            destination_pile = self.player_areas[to_area].get_pile(to_pile_location)
+            if origin_pile == None:
+                print "There are no cards in the pile you're looking at"
+                return False
+
+            if destination_pile:
+                if value_map[origin_pile.view_top_card().value] == value_map[destination_pile.view_top_card().value] + 1 and\
+                    origin_pile.view_top_card().suit == destination_pile.view_top_card().suit:
+                    return True
+
+            if destination_pile == None and origin_pile.view_top_card().value == "A":
+                return True
+
+            if destination_pile == None:
+                print "You can only move Aces to empty nertz piles. You tried to move a " + str(origin_pile.view_top_card())
+                return False
+        ## Stacking Area rules
+        origin_pile = self.player_areas[player][from_area].get_pile(from_pile_location)
+        destination_pile = self.player_areas[player][to_area].get_pile(to_pile_location)
+
+        if to_area == "stacking_area":
+            if value_map[origin_pile.view_top_card().value] == value_map[destination_pile.view_top_card().value] - 1 and\
+                origin_pile.view_top_card().color != destination_pile.view_top_card().color:
+                return True
+
         return True
 
 
@@ -139,8 +198,9 @@ nertz_test = Nertz(["jordan", "annie"])
 # print nertz_test
 nertz_test.deal_cards()
 # print nertz_test
-nertz_test.move("stacking_area", "fourth", "communal_area", "annie_spades", "annie")
+nertz_test.move("stacking_area", "first", "communal_area", "annie_spades", "annie")
 print nertz_test
 nertz_test.flip_cards("jordan")
+print nertz_test
 nertz_test.flip_cards("jordan")
 print nertz_test

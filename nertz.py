@@ -6,13 +6,23 @@ from card import Card
 from pile import Pile
 from area import Area
 import random
+import datetime
+from time import strftime
 class Nertz:
-    def __init__(self, players=[], adjusting_nertz_pile=False):
+    def __init__(self, players=[], adjusting_nertz_pile=False, log_name=None):
         self.players = players
         self.adjusting_nertz_pile = adjusting_nertz_pile
         self.player_areas = self.generatePlayerAreas(players)
         self.turn = 0
         self.nertz_pile_count = 13
+        self.log_name = log_name
+        welcome = "Let's play Nertz"
+        for player_count in range(len(players)):
+            if player_count < len(players) - 1
+                welcome = welcome + ", "player
+            else:
+                welcome = welcome + ", "+player"!"
+        self.log(welcome)
 
     #Return visible game state
     def __str__(self):
@@ -22,6 +32,8 @@ class Nertz:
                 for area in self.player_areas[player]:
                     game_state = "\n" + game_state + player + "'s " + str(area) + str(self.player_areas[player][area])
         game_state = game_state + str(self.player_areas["communal_area"])
+        output = game_state
+        self.log(output)
         return game_state
 
     #Generates the necessary areas for each player_areas
@@ -44,6 +56,7 @@ class Nertz:
     def deal_cards(self):
         values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
         suit_color = [("hearts", "red"), ("diamonds", "red"), ("spades", "black"), ("clubs", "black")]
+        self.log("Dealing Cards . . . ")
         for player in players:
             self.turn += 1
             #Create a deck of 52 cards
@@ -72,10 +85,11 @@ class Nertz:
                 self.player_areas[player]["stacking_area"].add_pile((location, top_card_pile))
             #put the rest in the flipping_area
             self.player_areas[player]["flipping_area"].add_pile(("flipping_location", standard_deck))
+        self.log("Cards Dealt" + str(self))
         #This bit here goes through and prints out everything for visual verification
 
 
-    def move(self, from_area, from_pile_location, to_area, to_pile_location, player=None, flip=False):
+    def move(self, from_area, from_pile_location, to_area, to_pile_location, player=None, flip=False, log=True):
         flipping_area = "flipping_area"
         if player is None:
             player = self.players[0]
@@ -95,6 +109,7 @@ class Nertz:
                     card_at_dest = None
                     self.player_areas[to_area].add_pile((to_pile_location, Pile([])))
                     pile_at_dest = self.player_areas[to_area].get_pile(to_pile_location)
+
             #If it's not in the communal area then we need to get look at a specific player's playing areas
             else:
                 card = self.player_areas[player][from_area].get_pile(from_pile_location).draw_card()
@@ -113,15 +128,37 @@ class Nertz:
                 card.flip_card()
             pile_at_dest.add_card(card)
 
+            if log:
+                if to_area == "communal_area":
+                    self.log(str(card) + " was moved from " +player+"'s " + from_area + " to "+ to_area)
+                    self.log(str(self.player_areas[player][from_area]))
+                    self.log(str(self.player_areas[to_area]))
+
+                else:
+                    if to_area == from_area:
+                        self.log(str(card) + " was moved from " +player+"'s "+ from_pile_location + " to "+player+"'s " + to_pile_location)
+                        self.log(str(self.player_areas[player][to_area]))
+                    else:
+                        self.log(str(card) + " was moved from "+player+"'s " + from_area + " to " +player+"'s "+ to_area)
+                        self.log(str(self.player_areas[player][from_area]))
+                        self.log(str(self.player_areas[player][to_area]))
+
     def flip_cards(self, player=None, num_to_flip=3):
         area = "flipping_area"
         from_location = "flipping_location"
         to_location = "playing_location"
+        count = 0
         if player is None:
             player = self.player[0]
         if self.player_areas[player][area].get_pile(from_location).card_count > 0:
             for i in range(num_to_flip):
-                self.move(area, from_location, area, to_location, player, True)
+                count += 1
+                if count == num_to_flip:
+                    self.log(str(count) + " cards were flipped in "+player+"'s "+"flipping area.")
+                    self.move(area, from_location, area, to_location, player, True, True)
+                else:
+                    self.move(area, from_location, area, to_location, player, True, False)
+
             return self.player_areas[player][area].get_pile(to_location).view_top_card()
         return None
 
@@ -188,19 +225,36 @@ class Nertz:
 
         return True
 
+    #Creates a file where events that happen during a game of nertz are stored
+    #If no name is is specified the game is logged to a file named with the time stamp when the game is initiated
+    def log(self, output, name=None):
+        name = self.log_name
+        if name:
+            with open("c:/Users/Jordan/Documents/cards/" + name + ".txt", 'a+') as nertz_game_log:
+                nertz_game_log.write(output + "\n\n")
+        else:
+            with open("c:/Users/Jordan/Documents/cards/"+str(strftime("%Y-%m-%d %H:%M:%S")) + ".txt", 'a+') as nertz_game_log:
+                nertz_game_log.write(output)
+
+
+
+
+
+
+
 
 
 
 
 
 players = ["jordan", "annie"]
-nertz_test = Nertz(["jordan", "annie"])
+nertz_test = Nertz(["jordan", "annie"], log_name="nertz_log_1")
 # print nertz_test
 nertz_test.deal_cards()
 # print nertz_test
 nertz_test.move("stacking_area", "first", "communal_area", "annie_spades", "annie")
-print nertz_test
+# print nertz_test
 nertz_test.flip_cards("jordan")
-print nertz_test
+# print nertz_test
 nertz_test.flip_cards("jordan")
-print nertz_test
+# print nertz_test

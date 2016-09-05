@@ -7,7 +7,7 @@ from pile import Pile
 from area import Area
 import random
 import datetime
-from time import strftime
+import time
 class Nertz:
     def __init__(self, players=[], adjusting_nertz_pile=False, log_name=None):
         self.players = players
@@ -17,12 +17,14 @@ class Nertz:
         self.nertz_pile_count = 13
         self.log_name = log_name
         welcome = "Let's play Nertz"
-        for player_count in range(len(players)):
-            if player_count < len(players) - 1
-                welcome = welcome + ", "player
+        for player_index in range(len(players)):
+            if player_index < len(players) - 1:
+                welcome = welcome + ", "+players[player_index]
             else:
-                welcome = welcome + ", "+player"!"
+                welcome = welcome + " and "+players[player_index]+"!"
         self.log(welcome)
+        print welcome
+        self.user_input()
 
     #Return visible game state
     def __str__(self):
@@ -229,12 +231,107 @@ class Nertz:
     #If no name is is specified the game is logged to a file named with the time stamp when the game is initiated
     def log(self, output, name=None):
         name = self.log_name
-        if name:
-            with open("c:/Users/Jordan/Documents/cards/" + name + ".txt", 'a+') as nertz_game_log:
-                nertz_game_log.write(output + "\n\n")
+        # if name:
+        #     with open("c:/Users/Jordan/Documents/cards/" + name + ".txt", 'a+') as nertz_game_log:
+        #         nertz_game_log.write(output + "\n\n")
+        # else:
+        #     with open("c:/Users/Jordan/Documents/cards/"+str(strftime("%Y-%m-%d %H:%M:%S")) + ".txt", 'a+') as nertz_game_log:
+        #         nertz_game_log.write(output)
+
+
+    def user_input(self):
+        dealt = False
+        cmd = raw_input("nertz_prompt# ")
+        if cmd.split(" ")[0] == "show":
+            args = cmd.split(" ")
+            if len(args) == 1:
+                print self
+            elif len(args) == 2:
+                if args[1] in self.players:
+                    for area in self.player_areas[args[1]]:
+                        print area
+                elif args[1] == "players":
+                    for player in players:
+                        print player
+                elif args[1] == "communal_area":
+                    print self.player_areas[args[1]]
+                else:
+                    print "Sorry "+args[1]+" is not a player currently in the game. "+args[1]+" can join next game."
+            elif len(args) == 3:
+                if args[1] in self.players:
+                    if args[2] in self.player_areas[args[1]]:
+                        print self.player_areas[args[1]][args[2]]
+                    elif args[2] == "areas":
+                        for area in self.player_areas[args[1]]:
+                            print area
+                    else:
+                        print "There's no "+args[1]+" area. I suppose we could consider making one for this game"
+                else:
+                    print "Sorry "+args[1]+" is not a player currently in the game. "+args[1]+" can join next game."
+            elif len(args) == 4:
+                if args[1] in self.players:
+                    if args[2] in self.player_areas:
+                        if args[3] in self.player_areas[args[1]][args[2]].get_pile_locations():
+                            print self.player_areas[args[1]][args[2]].get_pile([args[3]])
+                        elif args[3] == "piles":
+                            for pile in self.player_areas[args[1]][args[2]].get_pile_locations():
+                                print pile
+                        else:
+                            print "There's no "+args[3]+" pile in "+args[2]
+                    else:
+                        print "There's no "+args[1]+" area. I suppose we could consider making one for this game"
+                else:
+                    "Sorry "+args[1]+" is not a player currently in the game. "+args[1]+" can join next game."
+            self.user_input()
+
+        elif cmd.split(" ")[0] == "deal":
+            if dealt:
+                print "You've already dealt cards"
+            else:
+                self.deal_cards()
+                print "Dealing ..."
+                time.sleep(1)
+                print self
+            self.user_input()
+
+        elif cmd.split(" ")[0] == "move":
+            args = cmd.split(" ")
+            if len(args) < 5:
+                print "Please specify at least 4 arguments origin_area[string], origin_pile_location_within_area[string], destination_area[string], destination_pile_location_within_area[string]"
+                print "For example: move [stacking_area] [first] [communal_area] [annie_spades]"
+                print "Additionally you can specify player[string]"
+
+            elif len(args)> 6:
+                print "Please specify at most 6 arguments origin_area[string], origin_pile_location_within_area[string], destination_area[string],\
+                 destination_pile_location_within_area[string]  player[string]"
+                print "For example: move [stacking_area] [first] [communal_area] [annie_spades] [annie]"
+
+            elif len(args) == 5:
+                self.move(args[1], args[2], args[3], args[4])
+
+            elif len(args) == 6:
+                if args[5] in self.players:
+                    self.move(args[1], args[2], args[3], args[4], args[5])
+                else:
+                    print "Sorry "+args[5]+" is not a player currently in the game. "+args[5]+" can join next game."
+
+            self.user_input()
+
+        elif cmd.split(" ")[0] == "help":
+            print "Available commands are 'show', 'deal', and 'move'"
+            print "'show' takes up to two optional arguments to show you a specific area or pile. Usage: show [area] [pile]"
+            print "'deal' Deals the cards for a standard nertz game then shows you where they are."
+            print "'move' Allows you to move a card from one pile to another in accordance with the rules of Nertz. Usage: deal origin area, origin pile location, desitination area, destination pile location, [player]"
+            self.user_input()
+
+        elif cmd.split(" ")[0] == "exit":
+            return
+
         else:
-            with open("c:/Users/Jordan/Documents/cards/"+str(strftime("%Y-%m-%d %H:%M:%S")) + ".txt", 'a+') as nertz_game_log:
-                nertz_game_log.write(output)
+            print "Not a valid command. Type 'help' for a list of commands"
+            self.user_input()
+
+
 
 
 
@@ -249,12 +346,12 @@ class Nertz:
 
 players = ["jordan", "annie"]
 nertz_test = Nertz(["jordan", "annie"], log_name="nertz_log_1")
-# print nertz_test
-nertz_test.deal_cards()
-# print nertz_test
-nertz_test.move("stacking_area", "first", "communal_area", "annie_spades", "annie")
-# print nertz_test
-nertz_test.flip_cards("jordan")
-# print nertz_test
-nertz_test.flip_cards("jordan")
+# # print nertz_test
+# nertz_test.deal_cards()
+# # print nertz_test
+# nertz_test.move("stacking_area", "first", "communal_area", "annie_spades", "annie")
+# # print nertz_test
+# nertz_test.flip_cards("jordan")
+# # print nertz_test
+# nertz_test.flip_cards("jordan")
 # print nertz_test

@@ -243,6 +243,7 @@ class Nertz:
     def user_input(self):
         dealt = False
         cmd = raw_input("nertz_prompt# ")
+        self.log("nertz_prompt# "+cmd)
         args = re.split("\s+", cmd)
         if args[0] == "show":
             if len(args) == 1:
@@ -298,13 +299,13 @@ class Nertz:
         elif args[0] == "move":
             args = cmd.split(" ")
             if len(args) < 5:
-                print "Please specify at least 4 arguments origin_area[string], origin_pile_location_within_area[string], destination_area[string], destination_pile_location_within_area[string]"
+                print "Please specify at least 4 arguments:\n origin_area[string], origin_pile_location_within_area[string], destination_area[string], destination_pile_location_within_area[string]\n"
                 print "For example: move [stacking_area] [first] [communal_area] [annie_spades]"
                 print "Additionally you can specify player[string]"
 
             elif len(args)> 6:
-                print "Please specify at most 6 arguments origin_area[string], origin_pile_location_within_area[string], destination_area[string],\
-                 destination_pile_location_within_area[string]  player[string]"
+                print "Please specify at most 6 arguments:\n origin_area[string], origin_pile_location_within_area[string], destination_area[string],\
+                 destination_pile_location_within_area[string]  player[string]\n"
                 print "For example: move [stacking_area] [first] [communal_area] [annie_spades] [annie]"
 
             elif len(args) == 5:

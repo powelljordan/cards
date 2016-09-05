@@ -8,6 +8,7 @@ from area import Area
 import random
 import datetime
 import time
+import re
 class Nertz:
     def __init__(self, players=[], adjusting_nertz_pile=False, log_name=None):
         self.players = players
@@ -242,8 +243,8 @@ class Nertz:
     def user_input(self):
         dealt = False
         cmd = raw_input("nertz_prompt# ")
-        if cmd.split(" ")[0] == "show":
-            args = cmd.split(" ")
+        args = re.split("\s+", cmd)
+        if args[0] == "show":
             if len(args) == 1:
                 print self
             elif len(args) == 2:
@@ -284,7 +285,7 @@ class Nertz:
                     "Sorry "+args[1]+" is not a player currently in the game. "+args[1]+" can join next game."
             self.user_input()
 
-        elif cmd.split(" ")[0] == "deal":
+        elif args[0] == "deal":
             if dealt:
                 print "You've already dealt cards"
             else:
@@ -294,7 +295,7 @@ class Nertz:
                 print self
             self.user_input()
 
-        elif cmd.split(" ")[0] == "move":
+        elif args[0] == "move":
             args = cmd.split(" ")
             if len(args) < 5:
                 print "Please specify at least 4 arguments origin_area[string], origin_pile_location_within_area[string], destination_area[string], destination_pile_location_within_area[string]"
@@ -317,14 +318,14 @@ class Nertz:
 
             self.user_input()
 
-        elif cmd.split(" ")[0] == "help":
-            print "Available commands are 'show', 'deal', and 'move'"
-            print "'show' takes up to two optional arguments to show you a specific area or pile. Usage: show [area] [pile]"
-            print "'deal' Deals the cards for a standard nertz game then shows you where they are."
-            print "'move' Allows you to move a card from one pile to another in accordance with the rules of Nertz. Usage: deal origin area, origin pile location, desitination area, destination pile location, [player]"
+        elif args[0] == "help":
+            print "\nAvailable commands are 'show', 'deal', and 'move'\n"
+            print "'show' takes up to two optional arguments to show you a specific area or pile. Usage: show [area] [pile]\n"
+            print "'deal' Deals the cards for a standard nertz game then shows you where they are.\n"
+            print "'move' Allows you to move a card from one pile to another in accordance with the rules of Nertz. \n Usage: deal origin area, origin pile location, desitination area, destination pile location, [player]\n"
             self.user_input()
 
-        elif cmd.split(" ")[0] == "exit":
+        elif args[0] == "exit":
             return
 
         else:
@@ -345,7 +346,7 @@ class Nertz:
 
 
 players = ["jordan", "annie"]
-nertz_test = Nertz(["jordan", "annie"], log_name="nertz_log_1")
+nertz_test = Nertz(["jordan", "annie"], log_name="nertz_log_2")
 # # print nertz_test
 # nertz_test.deal_cards()
 # # print nertz_test

@@ -231,12 +231,12 @@ class Nertz:
     #If no name is is specified the game is logged to a file named with the time stamp when the game is initiated
     def log(self, output, name=None):
         name = self.log_name
-        # if name:
-        #     with open("c:/Users/Jordan/Documents/cards/" + name + ".txt", 'a+') as nertz_game_log:
-        #         nertz_game_log.write(output + "\n\n")
-        # else:
-        #     with open("c:/Users/Jordan/Documents/cards/"+str(strftime("%Y-%m-%d %H:%M:%S")) + ".txt", 'a+') as nertz_game_log:
-        #         nertz_game_log.write(output)
+        if name:
+            with open("c:/Users/Jordan/Documents/cards/" + name + ".txt", 'a+') as nertz_game_log:
+                nertz_game_log.write(output + "\n\n")
+        else:
+            with open("c:/Users/Jordan/Documents/cards/"+str(strftime("%Y-%m-%d %H:%M:%S")) + ".txt", 'a+') as nertz_game_log:
+                nertz_game_log.write(output)
 
 
     def user_input(self):

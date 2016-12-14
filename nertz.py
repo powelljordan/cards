@@ -127,6 +127,8 @@ class Nertz:
                     if to_area == flipping_area:
                         self.player_areas[player][to_area].add_pile((to_pile_location, Pile([])))
                         pile_at_dest = self.player_areas[player][to_area].get_pile(to_pile_location)
+                if from_area == "nertz_pile_area":
+                    self.flip(from_area, from_pile_location, player=player)
             if flip:
                 card.flip_card()
             pile_at_dest.add_card(card)
@@ -152,18 +154,39 @@ class Nertz:
         to_location = "playing_location"
         count = 0
         if player is None:
-            player = self.player[0]
+            player = self.players[0]
+        print self.player_areas[player][area].get_pile(from_location).card_count
         if self.player_areas[player][area].get_pile(from_location).card_count > 0:
             for i in range(num_to_flip):
-                count += 1
-                if count == num_to_flip:
-                    self.log(str(count) + " cards were flipped in "+player+"'s "+"flipping area.")
-                    self.move(area, from_location, area, to_location, player, True, True)
+                if self.player_areas[player][area].get_pile(from_location).card_count > 0:
+                    count += 1
+                    if count == num_to_flip:
+                        self.log(str(count) + " cards were flipped in "+player+"'s "+"flipping area.")
+                        self.move(area, from_location, area, to_location, player, True, True)
+                    else:
+                        self.move(area, from_location, area, to_location, player, True, False)
                 else:
-                    self.move(area, from_location, area, to_location, player, True, False)
+                    pile = self.player_areas[player][area].get_pile(to_location)
+                    print pile.card_list, len(pile)
+                    for pos, elt in enumerate(self.player_areas[player][area].get_pile(to_location).card_list):
+                        card = pile.view_top_card()
+                        self.move(area, to_location, area, from_location, player, True, True)
 
             return self.player_areas[player][area].get_pile(to_location).view_top_card()
         return None
+
+    def flip(self, area, location, player=None):
+        if player is None:
+            player = self.players[0]
+        try:
+            pile = self.player_areas[player][area].get_pile(location)
+            card = pile.view_top_card()
+            pile.draw_card()
+            card.flip_card()
+            pile.add_card(card)
+        except AttributeError as e:
+            print e
+
 
     def rules(self, from_area, from_pile_location, to_area, to_pile_location, player):
         ##Value Map
@@ -218,13 +241,22 @@ class Nertz:
                 print "You can only move Aces to empty nertz piles. You tried to move a " + str(origin_pile.view_top_card())
                 return False
         ## Stacking Area rules
+        # print "EY THERE", self.player_areas[player][from_area].get_pile(from_pile_location), "done"
         origin_pile = self.player_areas[player][from_area].get_pile(from_pile_location)
+        # print origin_pile.view_top_card().value
         destination_pile = self.player_areas[player][to_area].get_pile(to_pile_location)
+        # print self.player_areas[player][to_area]
 
         if to_area == "stacking_area":
-            if value_map[origin_pile.view_top_card().value] == value_map[destination_pile.view_top_card().value] - 1 and\
-                origin_pile.view_top_card().color != destination_pile.view_top_card().color:
-                return True
+            try:
+                if value_map[origin_pile.view_top_card().value] == value_map[destination_pile.view_top_card().value] - 1 and\
+                    origin_pile.view_top_card().color != destination_pile.view_top_card().color:
+                    return True
+            except AttributeError:
+                if origin_pile.view_top_card() == None:
+                    return False
+                elif destination_pile.view_top_card() == None:
+                    return True
 
         return True
 
@@ -307,6 +339,7 @@ class Nertz:
                 print "Please specify at most 6 arguments:\n origin_area[string], origin_pile_location_within_area[string], destination_area[string],\
                  destination_pile_location_within_area[string]  player[string]\n"
                 print "For example: move [stacking_area] [first] [communal_area] [annie_spades] [annie]"
+                print "You entered: "+args
 
             elif len(args) == 5:
                 self.move(args[1], args[2], args[3], args[4])
@@ -318,12 +351,23 @@ class Nertz:
                     print "Sorry "+args[5]+" is not a player currently in the game. "+args[5]+" can join next game."
 
             self.user_input()
+        elif args[0] == "flip":
+            args=cmd.split()
+            try:
+                if len(args) > 1:
+                    self.flip_cards(args[1])
+                else:
+                    self.flip_cards()
+            except IndexError:
+                pass
+            self.user_input()
+
 
         elif args[0] == "help":
             print "\nAvailable commands are 'show', 'deal', and 'move'\n"
             print "'show' takes up to two optional arguments to show you a specific area or pile. Usage: show [area] [pile]\n"
             print "'deal' Deals the cards for a standard nertz game then shows you where they are.\n"
-            print "'move' Allows you to move a card from one pile to another in accordance with the rules of Nertz. \n Usage: deal origin area, origin pile location, desitination area, destination pile location, [player]\n"
+            print "'move' Allows you to move a card from one pile to another in accordance with the rules of Nertz. \n Usage: move, origin area, origin pile location, desitination area, destination pile location, [player]\n"
             self.user_input()
 
         elif args[0] == "exit":
@@ -348,12 +392,13 @@ class Nertz:
 
 players = ["jordan", "annie"]
 nertz_test = Nertz(["jordan", "annie"], log_name="nertz_log_2")
-# # print nertz_test
+# print nertz_test
 # nertz_test.deal_cards()
-# # print nertz_test
+# print nertz_test
 # nertz_test.move("stacking_area", "first", "communal_area", "annie_spades", "annie")
-# # print nertz_test
-# nertz_test.flip_cards("jordan")
-# # print nertz_test
+# print nertz_test
+# nertz_test.move("nertz_pile_area", "nertz_pile_location", "stacking_area", "first", "annie")
+# # nertz_test.flip_cards("jordan")
+# print nertz_test
 # nertz_test.flip_cards("jordan")
 # print nertz_test

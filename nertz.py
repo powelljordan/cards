@@ -31,9 +31,14 @@ class Nertz:
     def __str__(self):
         game_state = ""
         for player in self.player_areas:
+            if player in self.players:
+                game_state = game_state + "###########################################\n"
             if player != "communal_area":
                 for area in self.player_areas[player]:
                     game_state = "\n" + game_state + player + "'s " + str(area) + str(self.player_areas[player][area])
+            if player in self.players:
+                game_state = game_state + "###########################################\n\n\n\n\n"
+
         game_state = game_state + str(self.player_areas["communal_area"])
         output = game_state
         self.log(output)
@@ -65,7 +70,7 @@ class Nertz:
             #Create a deck of 52 cards
             standard_deck = Pile([Card(style=player,color=color, suit=suit, value=val) for val in values for (suit, color) in suit_color])
             #shuffle that deck a random number of times
-            standard_deck.shuffle(3+self.turn) #changed this just for testing
+            standard_deck.shuffle(4+self.turn) #changed this just for testing
             #take off the top 13 cards
             nertz_pile_area_cards = Pile()
             for i in range(self.nertz_pile_count - 1):
@@ -155,7 +160,6 @@ class Nertz:
         count = 0
         if player is None:
             player = self.players[0]
-        print self.player_areas[player][area].get_pile(from_location).card_count
         if self.player_areas[player][area].get_pile(from_location).card_count > 0:
             for i in range(num_to_flip):
                 if self.player_areas[player][area].get_pile(from_location).card_count > 0:
@@ -167,12 +171,12 @@ class Nertz:
                         self.move(area, from_location, area, to_location, player, True, False)
                 else:
                     pile = self.player_areas[player][area].get_pile(to_location)
-                    print pile.card_list, len(pile)
-                    for pos, elt in enumerate(self.player_areas[player][area].get_pile(to_location).card_list):
-                        card = pile.view_top_card()
+                    card_list = [card for card in self.player_areas[player][area].get_pile(to_location).card_list]
+                    for e in card_list:
                         self.move(area, to_location, area, from_location, player, True, True)
-
+            # print len(self.player_areas[player][area].get_pile(to_location).card_list)
             return self.player_areas[player][area].get_pile(to_location).view_top_card()
+        # print self.player_areas[player][area].get_pile(from_location).card_count
         return None
 
     def flip(self, area, location, player=None):
@@ -233,12 +237,15 @@ class Nertz:
                 if value_map[origin_pile.view_top_card().value] == value_map[destination_pile.view_top_card().value] + 1 and\
                     origin_pile.view_top_card().suit == destination_pile.view_top_card().suit:
                     return True
+                else:
+                    print "You can't play a "+str(origin_pile.view_top_card())+" on top of a "+str(destination_pile.view_top_card())
+                    return False
 
             if destination_pile == None and origin_pile.view_top_card().value == "A":
                 return True
 
             if destination_pile == None:
-                print "You can only move Aces to empty nertz piles. You tried to move a " + str(origin_pile.view_top_card())
+                print "You can only move Aces to empty piles. You tried to move a " + str(origin_pile.view_top_card())
                 return False
         ## Stacking Area rules
         # print "EY THERE", self.player_areas[player][from_area].get_pile(from_pile_location), "done"
@@ -252,8 +259,12 @@ class Nertz:
                 if value_map[origin_pile.view_top_card().value] == value_map[destination_pile.view_top_card().value] - 1 and\
                     origin_pile.view_top_card().color != destination_pile.view_top_card().color:
                     return True
+                else:
+                    print "You can't play a "+str(origin_pile.view_top_card())+" on top of a "+str(destination_pile.view_top_card())
+                    return False
             except AttributeError:
                 if origin_pile.view_top_card() == None:
+                    print str(origin_pile)
                     return False
                 elif destination_pile.view_top_card() == None:
                     return True
@@ -339,7 +350,7 @@ class Nertz:
                 print "Please specify at most 6 arguments:\n origin_area[string], origin_pile_location_within_area[string], destination_area[string],\
                  destination_pile_location_within_area[string]  player[string]\n"
                 print "For example: move [stacking_area] [first] [communal_area] [annie_spades] [annie]"
-                print "You entered: "+args
+                print "You entered: "+str(args)
 
             elif len(args) == 5:
                 self.move(args[1], args[2], args[3], args[4])
@@ -365,7 +376,7 @@ class Nertz:
 
         elif args[0] == "help":
             print "\nAvailable commands are 'show', 'deal', and 'move'\n"
-            print "'show' takes up to two optional arguments to show you a specific area or pile. Usage: show [area] [pile]\n"
+            print "'show' takes up to two optional arguments to show you a specific area or pile. Usage: show [player] [area] [pile]\n"
             print "'deal' Deals the cards for a standard nertz game then shows you where they are.\n"
             print "'move' Allows you to move a card from one pile to another in accordance with the rules of Nertz. \n Usage: move, origin area, origin pile location, desitination area, destination pile location, [player]\n"
             self.user_input()

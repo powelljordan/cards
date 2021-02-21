@@ -1,7 +1,6 @@
 '''
     The card class defines a basic playing card. The front and back of a card is specified in this class
 '''
-from types import BooleanType
 class Card:
     def __init__(self, style=None, color=None, suit=None, value=None, face_up=False):
         self.face_up = face_up
@@ -14,7 +13,7 @@ class Card:
         self.check_rep()
         if self.face_up:
             return self.color+" "+self.value+" "+self.suit
-        return "Style: "+self.style
+        return "Facedown"
 
 
     ## Makes sure that all card attributes have been defined and make sense for a valid card
@@ -37,7 +36,7 @@ class Card:
             assert self.suit == None, card_attribute_error
             assert self.color == None, card_attribute_error
 
-        assert type(self.face_up) is BooleanType, card_state_error
+        assert isinstance(self.face_up, bool), card_state_error
 
         if self.suit.lower() == "diamonds":
             assert self.color.lower() == "red", card_face_value_error
@@ -62,9 +61,9 @@ class Card:
 #                          Tests                            #
 #############################################################
 
-ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
-# print ace_diamonds
+# ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
+# print(ace_diamonds)
 # ace_diamonds.flip_card()
-# print ace_diamonds
+# print(ace_diamonds)
 # ace_diamonds.flip_card()
-# print ace_diamonds
+# print(ace_diamonds)

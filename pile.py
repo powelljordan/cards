@@ -1,4 +1,3 @@
-from types import ListType
 from card import Card
 from itertools import islice, cycle
 import random
@@ -73,14 +72,16 @@ class Pile:
             return self.card_list.pop(0)
         return None
 
-    #Removes a pile from the top of this pile and returns that pile
+    #Removes pile_size cards from the top of this pile and returns those cards as a pile
     def remove_pile(self, pile_size):
         self.check_rep()
-        if pile_size > self.card_count:
-            pile_size = card_count
-        new_pile_list = self.card_list[0:pile_size]
-        self.card_list = self.card_list[pile_size:]
-        self.card_count -= pile_size
+        size = int(pile_size)
+        if size > self.card_count:
+            size = card_count
+        print(size)
+        new_pile_list = self.card_list[:size]
+        self.card_list = self.card_list[size:]
+        self.card_count -= size
         return Pile(new_pile_list)
 
     #Cuts this pile into the desired number of piles and returns a list of all the piles
@@ -99,23 +100,25 @@ class Pile:
         "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
         # Recipe credited to George Sakkis
         pending = len(iterables)
-        nexts = cycle(iter(it).next for it in iterables)
+        iterators = cycle(iter(it) for it in iterables)
         while pending:
             try:
-                for next in nexts:
-                    yield next()
+                for iterator in iterators:
+                    yield next(iterator)
             except StopIteration:
                 pending -= 1
-                nexts = cycle(islice(nexts, pending))
+                iterators = cycle(islice(iterators, pending))
 
     def shuffle(self, number_of_times):
         self.check_rep()
         combined_hand = self.card_list
         for i in range(number_of_times):
-            mid = len(combined_hand)/2
-            left_hand = combined_hand[:mid]
-            right_hand = combined_hand[mid:]
-            combined_hand = list(self.roundrobin(left_hand, right_hand))
+            first_third = int(random.randint(0, self.card_count))
+            second_third = int(random.randint(first_third, self.card_count))
+            left = combined_hand[:first_third]
+            middle = combined_hand[first_third:second_third]
+            right = combined_hand[second_third:]
+            combined_hand = list(self.roundrobin(middle, left, right))
         self.card_list = combined_hand
         return self
 
@@ -137,7 +140,7 @@ def generateDeck(card_values, card_suit_color_map):
 #                          Tests                            #
 #############################################################
 
-# deck = generateDeck(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], {"hearts":"red", "diamonds": "red", "spades":"black", "clubs":"black"})
+deck = generateDeck(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], {"hearts":"red", "diamonds": "red", "spades":"black", "clubs":"black"})
 
 def reset():
     deck = generateDeck(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], {"hearts":"red", "diamonds": "red", "spades":"black", "clubs":"black"})
@@ -146,12 +149,14 @@ def reset():
 
 ace_diamonds = Card(style="bicycle", suit="diamonds", value="ace", face_up=True, color="RED")
 nertz_pile = Pile(card_list=[ace_diamonds])
-#print deck
+# print("Nertz Pile:", nertz_pile)
+# print("Deck:", deck)
 # decks = deck.cut(3)
-# print decks
+# print("Deck cut in {n} parts".format(n=len(decks)))
 # for deck in decks:
-#     print deck
-# print nertz_pile
-# for i in range(8):
-#     print deck.shuffle(1)
-# print deck.flipDeck()
+#     print("Each deck:", deck)
+# print("Shuffles")
+# for i in range(20):
+#     print("Shuffled deck:", deck.shuffle(1))
+# deck.flipDeck()
+# print("Flipped deck:", deck)
